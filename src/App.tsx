@@ -1,234 +1,317 @@
-import { useState, useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import Ring3D from './components/Ring3D';
-import ParticleEffects from './components/ParticleEffects';
-import { CinematicButton } from './components/ui/CinematicButton';
+import { useState, useEffect } from 'react';
 
-// Landing Page with 3D Ring
-function LandingSection() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [scrollY, setScrollY] = useState(0);
+// Simple elegant jewellery website
+export default function App() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [ isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({
-        x: (e.clientX / window.innerWidth - 0.5) * 2,
-        y: (e.clientY / window.innerHeight - 0.5) * 2
-      });
-    };
-
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('scroll', handleScroll);
-    };
+    setIsVisible(true);
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % 3);
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
+  const slides = [
+    { title: "Ceylon Sapphires", subtitle: "World's Finest Gemstones", image: "https://images.pexels.com/photos/2695825/pexels-photo-2695825.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" },
+    { title: "Handcrafted Gold", subtitle: "Traditional Elegance", image: "https://images.pexels.com/photos/1191531/pexels-photo-1191531.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" },
+    { title: "Diamond Collection", subtitle: "Brilliance Redefined", image: "https://images.pexels.com/photos/2735970/pexels-photo-2735970.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" }
+  ];
+
   return (
-    <section className="relative h-screen flex items-center justify-center overflow-hidden">
-      {/* 3D Ring Background */}
-      <Ring3D mousePosition={mousePosition} scrollY={scrollY} />
+    <div style={{
+      fontFamily: "'Playfair Display', Georgia, serif",
+      background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
+      minHeight: '100vh',
+      color: '#fff'
+    }}>
+      {/* Header */}
+      <header style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        padding: '1.5rem 2rem',
+        background: 'rgba(10, 10, 10, 0.9)',
+        backdropFilter: 'blur(10px)',
+        zIndex: 1000,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{
+            width: '50px',
+            height: '50px',
+            background: 'linear-gradient(135deg, #d4af37, #f4e4bc)',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '24px',
+            fontWeight: 'bold',
+            color: '#0a0a0a'
+          }}>
+            KGJ
+          </div>
+          <div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#d4af37' }}>KEERTHI</div>
+            <div style={{ fontSize: '0.7rem', letterSpacing: '0.3em', color: '#888' }}>GEM & JEWELLERY</div>
+          </div>
+        </div>
 
-      {/* Particle Effects */}
-      <ParticleEffects />
+        <nav style={{ display: 'flex', gap: '2rem' }}>
+          {['Home', 'Collections', 'About', 'Contact'].map((item) => (
+            <a key={item} href={`#${item.toLowerCase()}`} style={{
+              color: '#d4af37',
+              textDecoration: 'none',
+              fontSize: '0.9rem',
+              letterSpacing: '0.1em',
+              transition: 'all 0.3s ease',
+              textTransform: 'uppercase'
+            }}>
+              {item}
+            </a>
+          ))}
+        </nav>
+      </header>
 
-      {/* Content */}
-      <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.5 }}
-        >
-          <h1 className="text-6xl md:text-8xl font-display font-bold mb-6 gold-gradient-text glow-gold">
+      {/* Hero Section */}
+      <section style={{
+        height: '100vh',
+        position: 'relative',
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        {slides.map((slide, index) => (
+          <div key={index} style={{
+            position: 'absolute',
+            inset: 0,
+            opacity: currentSlide === index ? 1 : 0,
+            transition: 'opacity 1s ease-in-out'
+          }}>
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              backgroundImage: `url(${slide.image})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              filter: 'brightness(0.4)'
+            }} />
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.7) 100%)'
+            }} />
+          </div>
+        ))}
+
+        <div style={{
+          position: 'relative',
+          zIndex: 2,
+          textAlign: 'center',
+          opacity: isVisible ? 1 : 0,
+          transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+          transition: 'all 1s ease'
+        }}>
+          <div style={{
+            fontSize: '0.9rem',
+            letterSpacing: '0.5em',
+            color: '#d4af37',
+            marginBottom: '1rem',
+            textTransform: 'uppercase'
+          }}>
+            Welcome to
+          </div>
+          <h1 style={{
+            fontSize: '5rem',
+            fontWeight: 'bold',
+            background: 'linear-gradient(135deg, #f4e4bc 0%, #d4af37 50%, #b8941f 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            marginBottom: '1rem',
+            textShadow: '0 0 40px rgba(212, 175, 55, 0.3)'
+          }}>
             KEERTHI
           </h1>
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <div className="h-px w-16 bg-gradient-to-r from-transparent to-[hsl(43,74%,49%)]" />
-            <span className="text-xl md:text-2xl tracking-[0.3em] font-light text-white/80">
-              GEM & JEWELLERY
-            </span>
-            <div className="h-px w-16 bg-gradient-to-l from-transparent to-[hsl(43,74%,49%)]" />
+          <div style={{
+            fontSize: '2rem',
+            letterSpacing: '0.3em',
+            color: '#fff',
+            marginBottom: '0.5rem'
+          }}>
+            GEM & JEWELLERY
           </div>
-        </motion.div>
+          <div style={{
+            fontSize: '1rem',
+            color: '#888',
+            marginTop: '2rem',
+            maxWidth: '600px',
+            margin: '2rem auto 0',
+            lineHeight: 1.8
+          }}>
+            {slides[currentSlide].subtitle}
+          </div>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1 }}
-          className="text-lg md:text-xl text-white/70 mb-12 max-w-2xl mx-auto leading-relaxed"
-        >
-          Where Dreams Become Reality. Handcrafted Excellence in Every Gem.
-        </motion.p>
+          <div style={{ marginTop: '3rem', display: 'flex', gap: '1.5rem', justifyContent: 'center' }}>
+            <button style={{
+              padding: '1rem 2.5rem',
+              background: 'linear-gradient(135deg, #d4af37, #b8941f)',
+              border: 'none',
+              color: '#0a0a0a',
+              fontSize: '0.9rem',
+              fontWeight: 'bold',
+              letterSpacing: '0.1em',
+              cursor: 'pointer',
+              textTransform: 'uppercase',
+              transition: 'all 0.3s ease'
+            }}>
+              View Collection
+            </button>
+            <button style={{
+              padding: '1rem 2.5rem',
+              background: 'transparent',
+              border: '2px solid #d4af37',
+              color: '#d4af37',
+              fontSize: '0.9rem',
+              fontWeight: 'bold',
+              letterSpacing: '0.1em',
+              cursor: 'pointer',
+              textTransform: 'uppercase',
+              transition: 'all 0.3s ease'
+            }}>
+              Book Appointment
+            </button>
+          </div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1.5 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-        >
-          <CinematicButton variant="gold" size="lg">
-            <span>Explore Collection</span>
-            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </CinematicButton>
-
-          <CinematicButton variant="outline" size="lg">
-            <span>Book Appointment</span>
-          </CinematicButton>
-        </motion.div>
-
-        {/* Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2 }}
-          className="absolute bottom-12 left-1/2 transform -translate-x-1/2"
-        >
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-xs tracking-widest text-white/40">SCROLL</span>
-            <motion.div
-              animate={{ y: [0, 10, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="w-px h-12 bg-gradient-to-b from-[hsl(43,74%,49%)] to-transparent"
+        {/* Slide indicators */}
+        <div style={{
+          position: 'absolute',
+          bottom: '2rem',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          gap: '0.75rem',
+          zIndex: 3
+        }}>
+          {slides.map((_, index) => (
+            <div
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              style={{
+                width: currentSlide === index ? '2rem' : '0.5rem',
+                height: '0.5rem',
+                background: currentSlide === index ? '#d4af37' : '#444',
+                borderRadius: '2px',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
             />
+          ))}
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" style={{
+        padding: '6rem 2rem',
+        maxWidth: '1200px',
+        margin: '0 auto'
+      }}>
+        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+          <div style={{ fontSize: '0.9rem', letterSpacing: '0.3em', color: '#d4af37', marginBottom: '1rem' }}>
+            ABOUT US
           </div>
-        </motion.div>
-      </div>
+          <h2 style={{ fontSize: '3rem', color: '#f4e4bc' }}>
+            Crafting Excellence Since 1985
+          </h2>
+        </div>
 
-      {/* Vignette overlay */}
-      <div className="absolute inset-0 bg-radial-gradient pointer-events-none" style={{
-        background: 'radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.6) 100%)'
-      }} />
-    </section>
-  );
-}
-
-// About Section
-function AboutSection() {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "center center"]
-  });
-
-  const opacity = useTransform(scrollYProgress, [0, 1], [0, 1]);
-  const y = useTransform(scrollYProgress, [0, 1], [100, 0]);
-
-  return (
-    <section ref={ref} className="relative min-h-screen flex items-center py-20 px-4">
-      <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-        {/* Left: Content */}
-        <motion.div style={{ opacity, y }}>
-          <div className="mb-8">
-            <span className="text-[hsl(43,74%,49%)] text-sm tracking-widest">ABOUT US</span>
-            <h2 className="text-4xl md:text-5xl font-display font-bold mt-2 gold-gradient-text">
-              Crafting Brilliance Since 1985
-            </h2>
-          </div>
-
-          <p className="text-white/70 leading-relaxed mb-6">
-            Located at No. 217/1, Galle Road, Moratuwa, Keerthi Gem And Jewellery has been Sri Lanka's
-            premier destination for exquisite gems and fine jewellery. Our master craftsmen blend
-            traditional techniques with modern design to create pieces that tell your story.
-          </p>
-
-          <p className="text-white/70 leading-relaxed mb-8">
-            From the finest Ceylon sapphires to handcrafted gold ornaments, every piece in our
-            collection reflects our commitment to quality, authenticity, and timeless elegance.
-          </p>
-
-          <div className="grid grid-cols-3 gap-6 mb-8">
-            {[
-              { number: '38+', label: 'Years Experience' },
-              { number: '5000+', label: 'Happy Customers' },
-              { number: '100%', label: 'Authentic Gems' }
-            ].map((stat, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.2 }}
-                className="text-center"
-              >
-                <div className="text-3xl md:text-4xl font-bold text-[hsl(43,74%,49%)]">
-                  {stat.number}
-                </div>
-                <div className="text-xs text-white/50 mt-1">{stat.label}</div>
-              </motion.div>
-            ))}
-          </div>
-
-          <CinematicButton variant="gold" size="md">
-            Learn Our Story
-          </CinematicButton>
-        </motion.div>
-
-        {/* Right: Feature Image */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1 }}
-          className="relative glass rounded-2xl p-8 border-glow-animate"
-        >
-          <div className="aspect-square rounded-xl overflow-hidden bg-gradient-to-br from-[hsl(43,74%,30%)] to-[hsl(43,74%,15%)] flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-6xl mb-4">💎</div>
-              <p className="text-white/60">Premium Gemstone</p>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gap: '3rem'
+        }}>
+          {[
+            { icon: '💎', title: "Premium Gems", desc: "Finest Ceylon sapphires and ethically sourced diamonds" },
+            { icon: '✨', title: "Master Craftsmanship", desc: "Traditional techniques meet modern design excellence" },
+            { icon: '🏆', title: "Trusted Legacy", desc: "38+ years serving Sri Lanka's jewellery connoisseurs" }
+          ].map((item, i) => (
+            <div key={i} style={{
+              padding: '2rem',
+              background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(10, 10, 10, 0.5) 100%)',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>{item.icon}</div>
+              <h3 style={{ fontSize: '1.5rem', color: '#d4af37', marginBottom: '1rem' }}>{item.title}</h3>
+              <p style={{ color: '#888', lineHeight: 1.6 }}>{item.desc}</p>
             </div>
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
+          ))}
+        </div>
+      </section>
 
-// Main App
-export default function App() {
-  const [isLoading, setIsLoading] = useState(true);
+      {/* Contact Section */}
+      <section id="contact" style={{
+        padding: '6rem 2rem',
+        background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(10, 10, 10, 0.5) 100%)',
+        textAlign: 'center'
+      }}>
+        <div style={{ fontSize: '0.9rem', letterSpacing: '0.3em', color: '#d4af37', marginBottom: '1rem' }}>
+          VISIT US
+        </div>
+        <h2 style={{ fontSize: '3rem', color: '#f4e4bc', marginBottom: '2rem' }}>
+          No. 217/1, Galle Road, Moratuwa
+        </h2>
+        <p style={{ color: '#888', marginBottom: '3rem', maxWidth: '600px', margin: '0 auto 3rem' }}>
+          Open Monday to Saturday, 9 AM to 7 PM
+        </p>
+        <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center' }}>
+          <a href="tel:+94771254212" style={{
+            padding: '1rem 2rem',
+            background: '#25d366',
+            color: '#fff',
+            textDecoration: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            fontSize: '0.9rem',
+            letterSpacing: '0.1em'
+          }}>
+            📞 077 125 4212
+          </a>
+          <a href="https://wa.me/94771254212" style={{
+            padding: '1rem 2rem',
+            background: '#25d366',
+            color: '#fff',
+            textDecoration: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            fontSize: '0.9rem',
+            letterSpacing: '0.1em'
+          }}>
+            💬 WhatsApp
+          </a>
+        </div>
+      </section>
 
-  useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => setIsLoading(false), 2000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  return (
-    <AnimatePresence mode="wait">
-      {isLoading ? (
-        <motion.div
-          key="loader"
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-[hsl(220,20%,8%)] z-50 flex items-center justify-center"
-        >
-          <div className="text-center">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              className="text-6xl mb-6"
-            >
-              💍
-            </motion.div>
-            <div className="gold-gradient-text text-2xl font-display">KEERTHI</div>
-          </div>
-        </motion.div>
-      ) : (
-        <motion.div
-          key="main"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1 }}
-        >
-          <LandingSection />
-          <AboutSection />
-        </motion.div>
-      )}
-    </AnimatePresence>
+      {/* Footer */}
+      <footer style={{
+        padding: '2rem',
+        textAlign: 'center',
+        borderTop: '1px solid rgba(212, 175, 55, 0.3)'
+      }}>
+        <div style={{ color: '#d4af37', fontSize: '1.5rem', marginBottom: '0.5rem' }}>
+          KEERTHI GEM & JEWELLERY
+        </div>
+        <div style={{ color: '#888', fontSize: '0.8rem' }}>
+          © 2024 All Rights Reserved | Handcrafted in Sri Lanka
+        </div>
+      </footer>
+    </div>
   );
 }
