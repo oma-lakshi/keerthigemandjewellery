@@ -1,16 +1,11 @@
 import { useRef, useMemo } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { MeshTransmissionMaterial, Float, Environment, Sparkles } from '@react-three/drei';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Float, Sparkles, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 
 function DiamondRing({ mousePosition, scrollY }: { mousePosition: { x: number; y: number }; scrollY: number }) {
   const ringRef = useRef<THREE.Group>(null);
   const diamondRef = useRef<THREE.Mesh>(null);
-
-  const diamondGeometry = useMemo(() => {
-    const geo = new THREE.OctahedronGeometry(0.4, 0);
-    return geo;
-  }, []);
 
   useFrame((state) => {
     if (ringRef.current && diamondRef.current) {
@@ -49,21 +44,17 @@ function DiamondRing({ mousePosition, scrollY }: { mousePosition: { x: number; y
         </mesh>
 
         {/* Diamond (large) */}
-        <mesh ref={diamondRef} position={[0, 0.4, 0]} geometry={diamondGeometry} scale={1}>
-          <MeshTransmissionMaterial
-            backside
-            samples={16}
-            resolution={512}
-            transmission={1}
-            roughness={0.0}
+        <mesh ref={diamondRef} position={[0, 0.4, 0]}>
+          <octahedronGeometry args={[0.4, 0]} />
+          <meshPhysicalMaterial
+            color="#ffffff"
+            metalness={0}
+            roughness={0}
+            transmission={0.9}
             thickness={0.5}
             ior={2.4}
-            chromaticAberration={0.06}
-            anisotropy={0.1}
-            distortion={0.2}
-            distortionScale={0.3}
-            temporalDistortion={0.1}
-            color="#ffffff"
+            clearcoat={1}
+            clearcoatRoughness={0}
           />
         </mesh>
 
@@ -71,15 +62,13 @@ function DiamondRing({ mousePosition, scrollY }: { mousePosition: { x: number; y
         {[...Array(5)].map((_, i) => (
           <mesh key={i} position={[Math.cos(i * 0.4) * 1.5, 0.2 + Math.sin(i * 0.4) * 0.3, Math.sin(i * 0.4) * 1.5]}>
             <octahedronGeometry args={[0.08, 0]} />
-            <MeshTransmissionMaterial
-              backside
-              samples={8}
-              resolution={256}
-              transmission={1}
-              roughness={0.0}
+            <meshPhysicalMaterial
+              color="#ffffff"
+              metalness={0}
+              roughness={0}
+              transmission={0.9}
               thickness={0.2}
               ior={2.4}
-              color="#ffffff"
             />
           </mesh>
         ))}

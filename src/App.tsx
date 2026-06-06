@@ -7,8 +7,7 @@ import { CinematicButton } from './components/ui/CinematicButton';
 // Landing Page with 3D Ring
 function LandingSection() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const { scrollY } = useScroll();
-  const scrollYValue = useTransform(scrollY, (v) => v);
+  const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -18,14 +17,22 @@ function LandingSection() {
       });
     };
 
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden">
       {/* 3D Ring Background */}
-      <Ring3D mousePosition={mousePosition} scrollY={scrollYValue.get() as number} />
+      <Ring3D mousePosition={mousePosition} scrollY={scrollY} />
 
       {/* Particle Effects */}
       <ParticleEffects />
